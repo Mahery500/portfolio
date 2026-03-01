@@ -6,9 +6,17 @@ const navMenu = document.querySelector('.nav-menu');
 const navLinks = document.querySelectorAll('.nav-link');
 
 // Toggle menu mobile
-burger.addEventListener('click', () => {
+burger.addEventListener('click', (e) => {
+    e.stopPropagation();
     burger.classList.toggle('active');
     navMenu.classList.toggle('active');
+    
+    // Bloquer le scroll du body quand le menu est ouvert
+    if (navMenu.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = '';
+    }
 });
 
 // Fermer le menu quand on clique sur un lien
@@ -16,7 +24,33 @@ navLinks.forEach(link => {
     link.addEventListener('click', () => {
         burger.classList.remove('active');
         navMenu.classList.remove('active');
+        document.body.style.overflow = '';
     });
+});
+
+// Fermer le menu en cliquant en dehors
+document.addEventListener('click', (e) => {
+    const isClickInsideNav = navMenu.contains(e.target);
+    const isClickOnBurger = burger.contains(e.target);
+    
+    if (!isClickInsideNav && !isClickOnBurger && navMenu.classList.contains('active')) {
+        burger.classList.remove('active');
+        navMenu.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+});
+
+// Fermer le menu lors du redimensionnement de la fenêtre
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (window.innerWidth > 768) {
+            burger.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }, 250);
 });
 
 // ========================================
@@ -206,16 +240,18 @@ statNumbers.forEach(stat => {
 });
 
 // ========================================
-// Effet parallaxe léger sur le hero
+// Effet parallaxe léger sur le hero (uniquement desktop)
 // ========================================
 const heroSection = document.querySelector('.hero');
 
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    if (heroSection && scrolled < window.innerHeight) {
-        heroSection.style.transform = `translateY(${scrolled * 0.5}px)`;
-    }
-});
+if (window.innerWidth > 768) {
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        if (heroSection && scrolled < window.innerHeight) {
+            heroSection.style.transform = `translateY(${scrolled * 0.4}px)`;
+        }
+    });
+}
 
 // ========================================
 // Console log stylisé (Easter egg développeur)
